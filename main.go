@@ -12,7 +12,8 @@ func main() {
 	}
 	server.Addr = ":8080"
 
+	mux.Handle("/", http.FileServer(http.Dir(".")))
+
 	// Start the server
 	server.ListenAndServe()
-
 }
