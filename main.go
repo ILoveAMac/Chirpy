@@ -1,0 +1,18 @@
+package main
+
+import (
+	"net/http"
+)
+
+func main() {
+	mux := http.NewServeMux()
+
+	server := &http.Server{
+		Handler: mux,
+	}
+	server.Addr = ":8080"
+
+	// Start the server
+	server.ListenAndServe()
+
+}
