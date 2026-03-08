@@ -26,15 +26,15 @@ func main() {
 	fileServer := http.FileServer(http.Dir("."))
 	mux.Handle("/app/", apiCfg.middlewareMetricsInc(http.StripPrefix("/app", fileServer)))
 
-	mux.HandleFunc("GET /healthz", serverHealth)
-	mux.HandleFunc("GET /metrics", apiCfg.getHits)
-	mux.HandleFunc("POST /reset", apiCfg.resetHits)
+	mux.HandleFunc("GET /api/healthz", serverHealth)
+	mux.HandleFunc("GET /admin/metrics", apiCfg.getHits)
+	mux.HandleFunc("POST /admin/reset", apiCfg.resetHits)
 
 	// Start the server
 	server.ListenAndServe()
 }
-
 func serverHealth(w http.ResponseWriter, r *http.Request) {
+
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(200)
 	w.Write([]byte("OK"))
@@ -45,11 +45,19 @@ func (cfg *apiConfig) getHits(w http.ResponseWriter, r *http.Request) {
 	hits := cfg.fileserverHits.Load()
 
 	// 2. Set the header (as requested in the instructions)
-	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Add("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 
 	// 3. Use fmt.Fprintf to format the string "Hits: x" directly into the writer
-	fmt.Fprintf(w, "Hits: %d", hits)
+	fmt.Fprintf(w, `
+		<html>
+			<body>
+				<h1>Welcome, Chirpy Admin</h1>
+				<p>Chirpy has been visited %d times!</p>
+			</body>
+		</html>
+	`, hits)
+
 }
 
 func (cfg *apiConfig) resetHits(w http.ResponseWriter, r *http.Request) {
